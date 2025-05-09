@@ -67,11 +67,24 @@
     let timerInterval;
     let timerStarted = false;
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    function isSolvable(arr) {
+      const nums = arr.filter(n => n !== null);
+      let inversions = 0;
+      for (let i = 0; i < nums.length - 1; i++) {
+        for (let j = i + 1; j < nums.length; j++) {
+          if (nums[i] > nums[j]) inversions++;
+        }
       }
+      return inversions % 2 === 0;
+    }
+
+    function shuffle(arr) {
+      do {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      } while (!isSolvable(arr));
     }
 
     function render() {
@@ -137,8 +150,7 @@
       render();
     }
 
-    shuffle(tiles);
-    render();
+    restartGame();
   </script>
 </body>
 </html>
