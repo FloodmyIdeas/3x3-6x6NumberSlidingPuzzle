@@ -61,30 +61,41 @@
     const moveCountEl = document.getElementById('moveCount');
     const timerEl = document.getElementById('timer');
 
-    let tiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
+    let tiles = [];
     let moveCount = 0;
     let seconds = 0;
     let timerInterval;
     let timerStarted = false;
 
     function isSolvable(arr) {
-      const nums = arr.filter(n => n !== null);
-      let inversions = 0;
-      for (let i = 0; i < nums.length - 1; i++) {
-        for (let j = i + 1; j < nums.length; j++) {
-          if (nums[i] > nums[j]) inversions++;
+      const flat = arr.slice();
+      const inversions = flat.reduce((inv, curr, i) => {
+        if (curr === null) return inv;
+        for (let j = i + 1; j < flat.length; j++) {
+          if (flat[j] !== null && flat[i] > flat[j]) inv++;
         }
-      }
+        return inv;
+      }, 0);
       return inversions % 2 === 0;
     }
 
-    function shuffle(arr) {
+    function shuffle() {
+      let arr;
       do {
+        arr = [1, 2, 3, 4, 5, 6, 7, 8, null];
         for (let i = arr.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [arr[i], arr[j]] = [arr[j], arr[i]];
         }
-      } while (!isSolvable(arr));
+      } while (!isSolvable(arr) || isSolved(arr));
+      return arr;
+    }
+
+    function isSolved(arr = tiles) {
+      for (let i = 0; i < 8; i++) {
+        if (arr[i] !== i + 1) return false;
+      }
+      return arr[8] === null;
     }
 
     function render() {
@@ -123,13 +134,6 @@
       }
     }
 
-    function isSolved() {
-      for (let i = 0; i < 8; i++) {
-        if (tiles[i] !== i + 1) return false;
-      }
-      return tiles[8] === null;
-    }
-
     function startTimer() {
       timerStarted = true;
       timerInterval = setInterval(() => {
@@ -139,8 +143,7 @@
     }
 
     function restartGame() {
-      tiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
-      shuffle(tiles);
+      tiles = shuffle();
       moveCount = 0;
       seconds = 0;
       timerStarted = false;
