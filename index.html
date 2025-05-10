@@ -179,16 +179,21 @@
 
     function moveTile(index) {
       const emptyIndex = tiles.indexOf(null);
-      const x = index % size;
-      const y = Math.floor(index / size);
-      const emptyX = emptyIndex % size;
-      const emptyY = Math.floor(emptyIndex / size);
+      const row = Math.floor(index / size);
+      const col = index % size;
+      const emptyRow = Math.floor(emptyIndex / size);
+      const emptyCol = emptyIndex % size;
 
-      if (Math.abs(x - emptyX) + Math.abs(y - emptyY) === 1) {
+      const isAdjacent =
+        (row === emptyRow && Math.abs(col - emptyCol) === 1) ||
+        (col === emptyCol && Math.abs(row - emptyRow) === 1);
+
+      if (isAdjacent) {
         [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
         moveCount++;
         moveCountEl.textContent = moveCount;
         renderPuzzle();
+        startTimer();
 
         if (isSolved(tiles)) {
           clearInterval(timerInterval);
@@ -204,17 +209,17 @@
           }
           updateRecordDisplay();
         }
-
-        if (!timerStarted) startTimer();
       }
     }
 
     function startTimer() {
-      timerStarted = true;
-      timerInterval = setInterval(() => {
-        seconds++;
-        timerEl.textContent = seconds;
-      }, 1000);
+      if (!timerStarted) {
+        timerStarted = true;
+        timerInterval = setInterval(() => {
+          seconds++;
+          timerEl.textContent = seconds;
+        }, 1000);
+      }
     }
 
     function restartGame() {
@@ -223,14 +228,13 @@
       seconds = 0;
       timerStarted = false;
       clearInterval(timerInterval);
-      moveCountEl.textContent = moveCount;
-      timerEl.textContent = seconds;
-      updateRecordDisplay();
+      moveCountEl.textContent = '0';
+      timerEl.textContent = '0';
       renderPuzzle();
+      updateRecordDisplay();
     }
 
-    // Initialize
-    restartGame();
+    restartGame(); // Initial start
   </script>
 </body>
 </html>
