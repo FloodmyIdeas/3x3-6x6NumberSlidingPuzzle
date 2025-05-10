@@ -1,53 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sliding Puzzle</title>
+  <meta charset="UTF-8" />
+  <title>Sliding Puzzle Game</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
-      background-color: #f8f8f8;
+      background: #f0f0f0;
+      padding: 30px;
     }
 
     #controls {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
-    select {
+    select, button {
       font-size: 16px;
-      padding: 8px;
+      padding: 8px 12px;
+      margin: 5px;
     }
 
     #stats {
       font-size: 18px;
-      margin-bottom: 10px;
+      margin: 10px 0;
     }
 
     #puzzle {
       display: grid;
       gap: 5px;
-      margin: 0 auto;
+      justify-content: center;
+      margin-top: 15px;
     }
 
     .tile {
-      background-color: #3498db;
-      color: white;
+      width: 80px;
+      height: 80px;
       font-size: 24px;
       font-weight: bold;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      background: #3498db;
+      color: white;
       border-radius: 5px;
       cursor: pointer;
-      width: 80px;
-      height: 80px;
       user-select: none;
     }
 
     .empty {
-      background-color: #ccc;
+      background: #ccc;
       cursor: default;
     }
   </style>
@@ -61,6 +63,7 @@
       <option value="5">5 × 5</option>
       <option value="6">6 × 6</option>
     </select>
+    <button id="restartBtn">🔁 Restart Puzzle</button>
   </div>
 
   <div id="stats">
@@ -74,6 +77,7 @@
     const moveCountEl = document.getElementById('moveCount');
     const timerEl = document.getElementById('timer');
     const sizeSelect = document.getElementById('sizeSelect');
+    const restartBtn = document.getElementById('restartBtn');
 
     let size = parseInt(sizeSelect.value);
     let tiles = [];
@@ -87,6 +91,8 @@
       restartGame();
     });
 
+    restartBtn.addEventListener('click', restartGame);
+
     function isSolvable(arr, size) {
       let inversions = 0;
       for (let i = 0; i < arr.length; i++) {
@@ -95,7 +101,6 @@
           if (arr[j] !== null && arr[i] > arr[j]) inversions++;
         }
       }
-
       const emptyRow = Math.floor(arr.indexOf(null) / size);
       if (size % 2 === 1) {
         return inversions % 2 === 0;
@@ -173,17 +178,17 @@
     }
 
     function restartGame() {
-      clearInterval(timerInterval);
-      timerStarted = false;
+      tiles = shuffleTiles(size);
       moveCount = 0;
       seconds = 0;
-      moveCountEl.textContent = '0';
-      timerEl.textContent = '0';
-      tiles = shuffleTiles(size);
+      timerStarted = false;
+      clearInterval(timerInterval);
+      moveCountEl.textContent = moveCount;
+      timerEl.textContent = seconds;
       renderPuzzle();
     }
 
-    restartGame();
+    restartGame(); // Start first puzzle
   </script>
 </body>
 </html>
