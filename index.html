@@ -5,45 +5,44 @@
   <title>Sliding Puzzle</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f0f0f0;
+      font-family: Arial, sans-serif;
       text-align: center;
       padding: 40px;
+      background-color: #f8f8f8;
     }
 
     #controls {
       margin-bottom: 20px;
     }
 
-    select, button {
+    select {
       font-size: 16px;
-      padding: 8px 12px;
-      margin: 0 10px;
+      padding: 8px;
     }
 
     #stats {
       font-size: 18px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     #puzzle {
       display: grid;
       gap: 5px;
       margin: 0 auto;
-      width: max-content;
     }
 
     .tile {
-      width: 80px;
-      height: 80px;
+      background-color: #3498db;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #4CAF50;
-      color: white;
-      font-size: 24px;
       border-radius: 5px;
       cursor: pointer;
+      width: 80px;
+      height: 80px;
       user-select: none;
     }
 
@@ -55,14 +54,13 @@
 </head>
 <body>
   <div id="controls">
-    🧩 Size:
-    <select id="sizeSelect" onchange="restartGame()">
-      <option value="3">3×3</option>
-      <option value="4" selected>4×4</option>
-      <option value="5">5×5</option>
-      <option value="6">6×6</option>
+    <label for="sizeSelect">🧩 Choose Puzzle Size:</label>
+    <select id="sizeSelect">
+      <option value="3">3 × 3</option>
+      <option value="4" selected>4 × 4</option>
+      <option value="5">5 × 5</option>
+      <option value="6">6 × 6</option>
     </select>
-    <button onclick="restartGame()">🔁 Restart</button>
   </div>
 
   <div id="stats">
@@ -84,19 +82,26 @@
     let timerStarted = false;
     let timerInterval;
 
+    sizeSelect.addEventListener('change', () => {
+      size = parseInt(sizeSelect.value);
+      restartGame();
+    });
+
     function isSolvable(arr, size) {
-      const inversions = arr.reduce((acc, val, i) => {
-        if (val === null) return acc;
+      let inversions = 0;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === null) continue;
         for (let j = i + 1; j < arr.length; j++) {
-          if (arr[j] !== null && val > arr[j]) acc++;
+          if (arr[j] !== null && arr[i] > arr[j]) inversions++;
         }
-        return acc;
-      }, 0);
+      }
 
       const emptyRow = Math.floor(arr.indexOf(null) / size);
-      return size % 2 === 1
-        ? inversions % 2 === 0
-        : (inversions + (size - emptyRow)) % 2 === 0;
+      if (size % 2 === 1) {
+        return inversions % 2 === 0;
+      } else {
+        return (inversions + (size - emptyRow)) % 2 === 0;
+      }
     }
 
     function isSolved(arr) {
@@ -154,9 +159,9 @@
           clearInterval(timerInterval);
           alert(`🎉 You solved it in ${moveCount} moves and ${seconds} seconds!`);
         }
-      }
 
-      if (!timerStarted) startTimer();
+        if (!timerStarted) startTimer();
+      }
     }
 
     function startTimer() {
@@ -170,11 +175,10 @@
     function restartGame() {
       clearInterval(timerInterval);
       timerStarted = false;
-      seconds = 0;
       moveCount = 0;
+      seconds = 0;
       moveCountEl.textContent = '0';
       timerEl.textContent = '0';
-      size = parseInt(sizeSelect.value);
       tiles = shuffleTiles(size);
       renderPuzzle();
     }
