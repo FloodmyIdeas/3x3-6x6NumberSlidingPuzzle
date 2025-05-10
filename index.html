@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>3x3 Sliding Puzzle</title>
+  <title>Sliding Puzzle</title>
   <style>
     body {
       font-family: sans-serif;
@@ -11,15 +11,23 @@
       padding-top: 40px;
     }
 
-    #stats {
+    #controls {
       margin-bottom: 20px;
+    }
+
+    select, button {
+      padding: 8px 12px;
+      margin: 0 10px;
+      font-size: 16px;
+    }
+
+    #stats {
       font-size: 18px;
+      margin-bottom: 15px;
     }
 
     #puzzle {
       display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
       gap: 5px;
       margin: 0 auto;
     }
@@ -27,7 +35,7 @@
     .tile {
       background-color: #4CAF50;
       color: white;
-      font-size: 32px;
+      font-size: 24px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -40,66 +48,81 @@
       background-color: #ccc;
       cursor: default;
     }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
+  <div id="controls">
+    🧩 Size:
+    <select id="sizeSelect" onchange="restartGame()">
+      <option value="3">3×3</option>
+      <option value="4" selected>4×4</option>
+      <option value="5">5×5</option>
+      <option value="6">6×6</option>
+    </select>
+    <button onclick="restartGame()">🔁 Restart</button>
+  </div>
+
   <div id="stats">
     🧠 Moves: <span id="moveCount">0</span> | ⏱️ Time: <span id="timer">0</span>s
   </div>
+
   <div id="puzzle"></div>
-  <button onclick="restartGame()">🔁 Restart</button>
 
   <script>
     const puzzle = document.getElementById('puzzle');
     const moveCountEl = document.getElementById('moveCount');
     const timerEl = document.getElementById('timer');
+    const sizeSelect = document.getElementById('sizeSelect');
 
+    let size = 4;
     let tiles = [];
     let moveCount = 0;
     let seconds = 0;
-    let timerInterval;
     let timerStarted = false;
+    let timerInterval;
 
-    function isSolvable(arr) {
-      const flat = arr.slice();
-      const inversions = flat.reduce((inv, curr, i) => {
-        if (curr === null) return inv;
-        for (let j = i + 1; j < flat.length; j++) {
-          if (flat[j] !== null && flat[i] > flat[j]) inv++;
+    function isSolvable(arr, size) {
+      let inversions = 0;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === null) continue;
+        for (let j = i + 1; j < arr.length; j++) {
+          if (arr[j] !== null && arr[i] > arr[j]) inversions++;
         }
-        return inv;
-      }, 0);
-      return inversions % 2 === 0;
+      }
+
+      const emptyRow = Math.floor(arr.indexOf(null) / size);
+      if (size % 2 === 1) {
+        return inversions % 2 === 0;
+      } else {
+        return (inversions + (size - emptyRow)) % 2 === 0;
+      }
     }
 
-    function shuffle() {
+    function shuffle(size) {
       let arr;
       do {
-        arr = [1, 2, 3, 4, 5, 6, 7, 8, null];
+        arr = Array.from({ length: size * size - 1 }, (_, i) => i + 1);
+        arr.push(null);
         for (let i = arr.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [arr[i], arr[j]] = [arr[j], arr[i]];
         }
-      } while (!isSolvable(arr) || isSolved(arr));
+      } while (!isSolvable(arr, size) || isSolved(arr));
       return arr;
     }
 
-    function isSolved(arr = tiles) {
-      for (let i = 0; i < 8; i++) {
+    function isSolved(arr) {
+      for (let i = 0; i < arr.length - 1; i++) {
         if (arr[i] !== i + 1) return false;
       }
-      return arr[8] === null;
+      return arr[arr.length - 1] === null;
     }
 
     function render() {
       puzzle.innerHTML = '';
+      puzzle.style.gridTemplateColumns = `repeat(${size}, 80px)`;
+      puzzle.style.gridTemplateRows = `repeat(${size}, 80px)`;
+
       tiles.forEach((value, index) => {
         const tile = document.createElement('div');
         tile.className = 'tile';
@@ -115,20 +138,22 @@
 
     function moveTile(index) {
       const emptyIndex = tiles.indexOf(null);
-      const validMoves = [index - 3, index + 3];
-      if (index % 3 !== 0) validMoves.push(index - 1);
-      if (index % 3 !== 2) validMoves.push(index + 1);
+      const x = index % size;
+      const y = Math.floor(index / size);
+      const emptyX = emptyIndex % size;
+      const emptyY = Math.floor(emptyIndex / size);
 
-      if (validMoves.includes(emptyIndex)) {
+      const distance = Math.abs(x - emptyX) + Math.abs(y - emptyY);
+      if (distance === 1) {
         if (!timerStarted) startTimer();
         [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
         moveCount++;
         moveCountEl.textContent = moveCount;
         render();
-        if (isSolved()) {
+        if (isSolved(tiles)) {
           clearInterval(timerInterval);
           setTimeout(() => {
-            alert(`🎉 You solved it in ${moveCount} moves and ${seconds} seconds!`);
+            alert(`🎉 Solved in ${moveCount} moves and ${seconds} seconds!`);
           }, 100);
         }
       }
@@ -143,13 +168,14 @@
     }
 
     function restartGame() {
-      tiles = shuffle();
+      clearInterval(timerInterval);
+      timerStarted = false;
       moveCount = 0;
       seconds = 0;
-      timerStarted = false;
-      clearInterval(timerInterval);
-      moveCountEl.textContent = moveCount;
-      timerEl.textContent = seconds;
+      timerEl.textContent = '0';
+      moveCountEl.textContent = '0';
+      size = parseInt(sizeSelect.value);
+      tiles = shuffle(size);
       render();
     }
 
