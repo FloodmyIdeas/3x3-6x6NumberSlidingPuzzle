@@ -26,6 +26,12 @@
       margin: 10px 0;
     }
 
+    #record {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
     #puzzle {
       display: grid;
       gap: 5px;
@@ -69,6 +75,7 @@
   <div id="stats">
     🧠 Moves: <span id="moveCount">0</span> | ⏱️ Time: <span id="timer">0</span>s
   </div>
+  <div id="record">🏆 Best (4×4): — moves | — s</div>
 
   <div id="puzzle"></div>
 
@@ -78,6 +85,7 @@
     const timerEl = document.getElementById('timer');
     const sizeSelect = document.getElementById('sizeSelect');
     const restartBtn = document.getElementById('restartBtn');
+    const recordEl = document.getElementById('record');
 
     let size = parseInt(sizeSelect.value);
     let tiles = [];
@@ -92,6 +100,28 @@
     });
 
     restartBtn.addEventListener('click', restartGame);
+
+    function getRecordKey(size) {
+      return `record_${size}`;
+    }
+
+    function loadRecord(size) {
+      const rec = localStorage.getItem(getRecordKey(size));
+      return rec ? JSON.parse(rec) : { moves: null, time: null };
+    }
+
+    function saveRecord(size, moves, time) {
+      localStorage.setItem(getRecordKey(size), JSON.stringify({ moves, time }));
+    }
+
+    function updateRecordDisplay() {
+      const rec = loadRecord(size);
+      if (rec.moves !== null && rec.time !== null) {
+        recordEl.textContent = `🏆 Best (${size}×${size}): ${rec.moves} moves | ${rec.time} s`;
+      } else {
+        recordEl.textContent = `🏆 Best (${size}×${size}): — moves | — s`;
+      }
+    }
 
     function isSolvable(arr, size) {
       let inversions = 0;
@@ -163,6 +193,16 @@
         if (isSolved(tiles)) {
           clearInterval(timerInterval);
           alert(`🎉 You solved it in ${moveCount} moves and ${seconds} seconds!`);
+
+          const record = loadRecord(size);
+          if (
+            record.moves === null ||
+            moveCount < record.moves ||
+            (moveCount === record.moves && seconds < record.time)
+          ) {
+            saveRecord(size, moveCount, seconds);
+          }
+          updateRecordDisplay();
         }
 
         if (!timerStarted) startTimer();
@@ -185,10 +225,12 @@
       clearInterval(timerInterval);
       moveCountEl.textContent = moveCount;
       timerEl.textContent = seconds;
+      updateRecordDisplay();
       renderPuzzle();
     }
 
-    restartGame(); // Start first puzzle
+    // Initialize
+    restartGame();
   </script>
 </body>
 </html>
