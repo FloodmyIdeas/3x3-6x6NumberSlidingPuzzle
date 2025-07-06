@@ -3,40 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <title>Sliding Puzzle Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Rubik', sans-serif;
       text-align: center;
-      background: #f0f0f0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
       padding: 30px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     #controls {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     select, button {
       font-size: 16px;
       padding: 8px 12px;
       margin: 5px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background-color: #ffffff22;
+      color: white;
+      transition: background-color 0.3s;
     }
 
-    #stats {
+    select:hover, button:hover {
+      background-color: #ffffff44;
+    }
+
+    #stats, #record {
       font-size: 18px;
       margin: 10px 0;
-    }
-
-    #record {
-      font-size: 16px;
-      color: #333;
-      margin-bottom: 10px;
+      color: #f8f8f8;
     }
 
     #puzzle {
       display: grid;
-      gap: 5px;
+      gap: 8px;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .tile {
@@ -47,15 +65,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #3498db;
+      background: linear-gradient(135deg, #3498db, #2980b9);
       color: white;
-      border-radius: 5px;
+      border-radius: 12px;
       cursor: pointer;
       user-select: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s, background 0.3s;
     }
 
-    .empty {
-      background: #ccc;
+    .tile:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #4aa3df, #3498db);
+    }
+
+    .tile.empty {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: none;
       cursor: default;
     }
   </style>
