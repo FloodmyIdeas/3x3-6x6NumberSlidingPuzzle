@@ -1,266 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sliding Puzzle Game</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Rubik', sans-serif;
-      text-align: center;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      padding: 30px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+<meta charset="UTF-8">
+<title>Sliding Puzzle Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
 
-    #controls {
-      margin-bottom: 20px;
-    }
+<style>
+body{
+font-family:'Rubik',sans-serif;
+text-align:center;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
+padding:30px;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
 
-    select, button {
-      font-size: 16px;
-      padding: 8px 12px;
-      margin: 5px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background-color: #ffffff22;
-      color: white;
-      transition: background-color 0.3s;
-    }
+#controls{margin-bottom:20px;}
 
-    select:hover, button:hover {
-      background-color: #ffffff44;
-    }
+select,button{
+font-size:16px;
+padding:8px 12px;
+margin:5px;
+border-radius:8px;
+border:none;
+cursor:pointer;
+background:#ffffff22;
+color:white;
+transition:.3s;
+}
 
-    #stats, #record {
-      font-size: 18px;
-      margin: 10px 0;
-      color: #f8f8f8;
-    }
+select:hover,button:hover{
+background:#ffffff44;
+}
 
-    #puzzle {
-      display: grid;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
+#stats,#record{
+font-size:18px;
+margin:10px 0;
+}
 
-    .tile {
-      width: 80px;
-      height: 80px;
-      font-size: 24px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      border-radius: 12px;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      transition: transform 0.2s, background 0.3s;
-    }
+#puzzle{
+display:grid;
+gap:8px;
+justify-content:center;
+margin-top:20px;
+padding:20px;
+border-radius:16px;
+background:rgba(255,255,255,0.1);
+box-shadow:0 8px 32px rgba(31,38,135,.37);
+backdrop-filter:blur(6px);
+border:1px solid rgba(255,255,255,.18);
+}
 
-    .tile:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #4aa3df, #3498db);
-    }
+.tile{
+width:80px;
+height:80px;
+font-size:24px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#3498db,#2980b9);
+border-radius:12px;
+cursor:pointer;
+user-select:none;
+box-shadow:0 4px 8px rgba(0,0,0,.3);
+transition:.2s;
+}
 
-    .tile.empty {
-      background: rgba(255, 255, 255, 0.2);
-      box-shadow: none;
-      cursor: default;
-    }
-  </style>
+.tile:hover{
+transform:scale(1.05);
+background:linear-gradient(135deg,#4aa3df,#3498db);
+}
+
+.tile.empty{
+background:rgba(255,255,255,0.2);
+box-shadow:none;
+cursor:default;
+}
+
+.solved{
+box-shadow:0 0 30px #00ffcc;
+}
+</style>
 </head>
+
 <body>
-  <div id="controls">
-    <label for="sizeSelect">🧩 Choose Puzzle Size:</label>
-    <select id="sizeSelect">
-      <option value="3">3 × 3</option>
-      <option value="4" selected>4 × 4</option>
-      <option value="5">5 × 5</option>
-      <option value="6">6 × 6</option>
-    </select>
-    <button id="restartBtn">🔁 Restart Puzzle</button>
-  </div>
 
-  <div id="stats">
-    🧠 Moves: <span id="moveCount">0</span> | ⏱️ Time: <span id="timer">0</span>s
-  </div>
-  <div id="record">🏆 Best (4×4): — moves | — s</div>
+<div id="controls">
+<label>🧩 Puzzle Size:</label>
 
-  <div id="puzzle"></div>
+<select id="sizeSelect">
+<option value="3">3 × 3</option>
+<option value="4" selected>4 × 4</option>
+<option value="5">5 × 5</option>
+<option value="6">6 × 6</option>
+<option value="7">7 × 7 (Hard)</option>
+</select>
 
-  <script>
-    const puzzle = document.getElementById('puzzle');
-    const moveCountEl = document.getElementById('moveCount');
-    const timerEl = document.getElementById('timer');
-    const sizeSelect = document.getElementById('sizeSelect');
-    const restartBtn = document.getElementById('restartBtn');
-    const recordEl = document.getElementById('record');
+<button id="restartBtn">🔁 Restart</button>
+</div>
 
-    let size = parseInt(sizeSelect.value);
-    let tiles = [];
-    let moveCount = 0;
-    let seconds = 0;
-    let timerStarted = false;
-    let timerInterval;
+<div id="stats">
+🧠 Moves: <span id="moveCount">0</span> |
+⏱️ Time: <span id="timer">0</span>s
+</div>
 
-    sizeSelect.addEventListener('change', () => {
-      size = parseInt(sizeSelect.value);
-      restartGame();
-    });
+<div id="record">🏆 Best: —</div>
 
-    restartBtn.addEventListener('click', restartGame);
+<div id="puzzle"></div>
 
-    function getRecordKey(size) {
-      return `record_${size}`;
-    }
+<script>
 
-    function loadRecord(size) {
-      const rec = localStorage.getItem(getRecordKey(size));
-      return rec ? JSON.parse(rec) : { moves: null, time: null };
-    }
+const puzzle=document.getElementById("puzzle");
+const moveCountEl=document.getElementById("moveCount");
+const timerEl=document.getElementById("timer");
+const sizeSelect=document.getElementById("sizeSelect");
+const restartBtn=document.getElementById("restartBtn");
+const recordEl=document.getElementById("record");
 
-    function saveRecord(size, moves, time) {
-      localStorage.setItem(getRecordKey(size), JSON.stringify({ moves, time }));
-    }
+let size=parseInt(sizeSelect.value);
+let tiles=[];
+let moveCount=0;
+let seconds=0;
+let timerStarted=false;
+let timerInterval;
 
-    function updateRecordDisplay() {
-      const rec = loadRecord(size);
-      if (rec.moves !== null && rec.time !== null) {
-        recordEl.textContent = `🏆 Best (${size}×${size}): ${rec.moves} moves | ${rec.time} s`;
-      } else {
-        recordEl.textContent = `🏆 Best (${size}×${size}): — moves | — s`;
-      }
-    }
+sizeSelect.addEventListener("change",()=>{
+size=parseInt(sizeSelect.value);
+restartGame();
+});
 
-    function isSolvable(arr, size) {
-      let inversions = 0;
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i] === null) continue;
-        for (let j = i + 1; j < arr.length; j++) {
-          if (arr[j] !== null && arr[i] > arr[j]) inversions++;
-        }
-      }
-      const emptyRow = Math.floor(arr.indexOf(null) / size);
-      if (size % 2 === 1) {
-        return inversions % 2 === 0;
-      } else {
-        return (inversions + (size - emptyRow)) % 2 === 0;
-      }
-    }
+restartBtn.addEventListener("click",restartGame);
 
-    function isSolved(arr) {
-      for (let i = 0; i < arr.length - 1; i++) {
-        if (arr[i] !== i + 1) return false;
-      }
-      return arr[arr.length - 1] === null;
-    }
+function getRecordKey(size){
+return `record_${size}`;
+}
 
-    function shuffleTiles(size) {
-      let arr;
-      do {
-        arr = Array.from({ length: size * size - 1 }, (_, i) => i + 1);
-        arr.push(null);
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-      } while (!isSolvable(arr, size) || isSolved(arr));
-      return arr;
-    }
+function loadRecord(size){
+const r=localStorage.getItem(getRecordKey(size));
+return r?JSON.parse(r):{moves:null,time:null};
+}
 
-    function renderPuzzle() {
-      puzzle.innerHTML = '';
-      puzzle.style.gridTemplateColumns = `repeat(${size}, 80px)`;
-      puzzle.style.gridTemplateRows = `repeat(${size}, 80px)`;
+function saveRecord(size,moves,time){
+localStorage.setItem(getRecordKey(size),JSON.stringify({moves,time}));
+}
 
-      tiles.forEach((value, index) => {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        if (value === null) {
-          tile.classList.add('empty');
-        } else {
-          tile.textContent = value;
-          tile.addEventListener('click', () => moveTile(index));
-        }
-        puzzle.appendChild(tile);
-      });
-    }
+function updateRecordDisplay(){
+const rec=loadRecord(size);
+if(rec.moves!==null){
+recordEl.textContent=`🏆 Best (${size}×${size}): ${rec.moves} moves | ${rec.time}s`;
+}else{
+recordEl.textContent=`🏆 Best (${size}×${size}): —`;
+}
+}
 
-    function moveTile(index) {
-      const emptyIndex = tiles.indexOf(null);
-      const row = Math.floor(index / size);
-      const col = index % size;
-      const emptyRow = Math.floor(emptyIndex / size);
-      const emptyCol = emptyIndex % size;
+function isSolved(arr){
+for(let i=0;i<arr.length-1;i++){
+if(arr[i]!==i+1) return false;
+}
+return arr[arr.length-1]===null;
+}
 
-      const isAdjacent =
-        (row === emptyRow && Math.abs(col - emptyCol) === 1) ||
-        (col === emptyCol && Math.abs(row - emptyRow) === 1);
+function isSolvable(arr,size){
 
-      if (isAdjacent) {
-        [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
-        moveCount++;
-        moveCountEl.textContent = moveCount;
-        renderPuzzle();
-        startTimer();
+let inversions=0;
 
-        if (isSolved(tiles)) {
-          clearInterval(timerInterval);
-          alert(`🎉 You solved it in ${moveCount} moves and ${seconds} seconds!`);
+for(let i=0;i<arr.length;i++){
+if(arr[i]==null) continue;
 
-          const record = loadRecord(size);
-          if (
-            record.moves === null ||
-            moveCount < record.moves ||
-            (moveCount === record.moves && seconds < record.time)
-          ) {
-            saveRecord(size, moveCount, seconds);
-          }
-          updateRecordDisplay();
-        }
-      }
-    }
+for(let j=i+1;j<arr.length;j++){
+if(arr[j]!=null && arr[i]>arr[j]) inversions++;
+}
+}
 
-    function startTimer() {
-      if (!timerStarted) {
-        timerStarted = true;
-        timerInterval = setInterval(() => {
-          seconds++;
-          timerEl.textContent = seconds;
-        }, 1000);
-      }
-    }
+const emptyRow=Math.floor(arr.indexOf(null)/size);
 
-    function restartGame() {
-      tiles = shuffleTiles(size);
-      moveCount = 0;
-      seconds = 0;
-      timerStarted = false;
-      clearInterval(timerInterval);
-      moveCountEl.textContent = '0';
-      timerEl.textContent = '0';
-      renderPuzzle();
-      updateRecordDisplay();
-    }
+if(size%2===1){
+return inversions%2===0;
+}else{
+return (inversions+(size-emptyRow))%2===0;
+}
 
-    restartGame(); // Initial start
-  </script>
+}
+
+function shuffleTiles(size){
+
+let arr;
+
+do{
+
+arr=Array.from({length:size*size-1},(_,i)=>i+1);
+arr.push(null);
+
+for(let i=arr.length-1;i>0;i--){
+
+const j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+
+}
+
+}while(!isSolvable(arr,size) || isSolved(arr));
+
+return arr;
+
+}
+
+function renderPuzzle(){
+
+puzzle.innerHTML="";
+puzzle.classList.remove("solved");
+
+puzzle.style.gridTemplateColumns=`repeat(${size},80px)`;
+puzzle.style.gridTemplateRows=`repeat(${size},80px)`;
+
+tiles.forEach((value,index)=>{
+
+const tile=document.createElement("div");
+
+tile.className="tile";
+
+if(value===null){
+tile.classList.add("empty");
+}else{
+tile.textContent=value;
+tile.addEventListener("click",()=>moveTile(index));
+}
+
+puzzle.appendChild(tile);
+
+});
+
+}
+
+function moveTile(index){
+
+const emptyIndex=tiles.indexOf(null);
+
+const row=Math.floor(index/size);
+const col=index%size;
+
+const emptyRow=Math.floor(emptyIndex/size);
+const emptyCol=emptyIndex%size;
+
+const adjacent=
+(row===emptyRow && Math.abs(col-emptyCol)===1) ||
+(col===emptyCol && Math.abs(row-emptyRow)===1);
+
+if(!adjacent) return;
+
+[tiles[index],tiles[emptyIndex]]=[tiles[emptyIndex],tiles[index]];
+
+moveCount++;
+moveCountEl.textContent=moveCount;
+
+renderPuzzle();
+startTimer();
+
+if(isSolved(tiles)){
+
+clearInterval(timerInterval);
+puzzle.classList.add("solved");
+
+setTimeout(()=>{
+alert(`🎉 Puzzle solved!\nMoves: ${moveCount}\nTime: ${seconds}s`);
+},200);
+
+const rec=loadRecord(size);
+
+if(rec.moves===null || moveCount<rec.moves || (moveCount===rec.moves && seconds<rec.time)){
+saveRecord(size,moveCount,seconds);
+}
+
+updateRecordDisplay();
+
+}
+
+}
+
+function startTimer(){
+
+if(timerStarted) return;
+
+timerStarted=true;
+
+timerInterval=setInterval(()=>{
+seconds++;
+timerEl.textContent=seconds;
+},1000);
+
+}
+
+function restartGame(){
+
+tiles=shuffleTiles(size);
+moveCount=0;
+seconds=0;
+timerStarted=false;
+
+clearInterval(timerInterval);
+
+moveCountEl.textContent="0";
+timerEl.textContent="0";
+
+renderPuzzle();
+updateRecordDisplay();
+
+}
+
+document.addEventListener("keydown",(e)=>{
+
+const empty=tiles.indexOf(null);
+
+const row=Math.floor(empty/size);
+const col=empty%size;
+
+let target=null;
+
+if(e.key==="ArrowUp" && row<size-1) target=empty+size;
+if(e.key==="ArrowDown" && row>0) target=empty-size;
+if(e.key==="ArrowLeft" && col<size-1) target=empty+1;
+if(e.key==="ArrowRight" && col>0) target=empty-1;
+
+if(target!==null) moveTile(target);
+
+});
+
+restartGame();
+
+</script>
+
 </body>
 </html>
